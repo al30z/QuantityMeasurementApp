@@ -1,36 +1,39 @@
-class Feet {
-    private final double value;
+enum LengthUnit {
+    FEET(12.0),   // 1 foot = 12 inches
+    INCH(1.0);    // base unit is inch
 
-    public Feet(double value) {
-        this.value = value;
+    private final double conversionFactor;
+
+    LengthUnit(double conversionFactor) {
+        this.conversionFactor = conversionFactor;
     }
 
-    public boolean equals(Feet other) {
-        return Double.compare(this.value, other.value) == 0;
+    public double toBaseUnit(double value) {
+        return value * conversionFactor;
     }
 }
 
-class Inches {
+class QuantityLength {
     private final double value;
+    private final LengthUnit unit;
 
-    public Inches(double value) {
+    public QuantityLength(double value, LengthUnit unit) {
         this.value = value;
+        this.unit = unit;
     }
 
-    public boolean equals(Inches other) {
-        return Double.compare(this.value, other.value) == 0;
+    public boolean equals(QuantityLength other) {
+        double thisValueInBase = this.unit.toBaseUnit(this.value);
+        double otherValueInBase = other.unit.toBaseUnit(other.value);
+        return Double.compare(thisValueInBase, otherValueInBase) == 0;
     }
 }
 
 public class QuantityMeasurementApp {
-
     public static void main(String[] args) {
-        Feet feet1 = new Feet(3.0);
-        Feet feet2 = new Feet(3.0);
-        System.out.println("Feet equality: " + feet1.equals(feet2));
+        QuantityLength feet = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength inches = new QuantityLength(12.0, LengthUnit.INCH);
 
-        Inches inch1 = new Inches(12.0);
-        Inches inch2 = new Inches(12.0);
-        System.out.println("Inches equality: " + inch1.equals(inch2));
+        System.out.println("Feet equals Inches: " + feet.equals(inches));
     }
 }
