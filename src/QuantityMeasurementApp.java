@@ -1,14 +1,44 @@
-public class QuantityMeasurementApp {
+enum LengthUnit {
+    FEET(12.0),          // 1 foot = 12 inches
+    INCH(1.0),           // base unit is inch
+    YARD(36.0),          // 1 yard = 36 inches
+    CM(0.393701);        // 1 cm = 0.393701 inches
 
-    public static boolean compareFeet(double value1, double value2) {
-        return Double.compare(value1, value2) == 0;
+    private final double conversionFactor;
+
+    LengthUnit(double conversionFactor) {
+        this.conversionFactor = conversionFactor;
     }
 
-    public static void main(String[] args) {
-        double feet1 = 3.0;
-        double feet2 = 3.0;
+    public double toBaseUnit(double value) {
+        return value * conversionFactor;
+    }
+}
 
-        boolean result = compareFeet(feet1, feet2);
-        System.out.println("Feet equality result: " + result);
+class QuantityLength {
+    private final double value;
+    private final LengthUnit unit;
+
+    public QuantityLength(double value, LengthUnit unit) {
+        this.value = value;
+        this.unit = unit;
+    }
+
+    public boolean equals(QuantityLength other) {
+        double thisValueInBase = this.unit.toBaseUnit(this.value);
+        double otherValueInBase = other.unit.toBaseUnit(other.value);
+        return Double.compare(thisValueInBase, otherValueInBase) == 0;
+    }
+}
+
+public class QuantityMeasurementApp {
+    public static void main(String[] args) {
+        QuantityLength yard = new QuantityLength(1.0, LengthUnit.YARD);
+        QuantityLength feet = new QuantityLength(3.0, LengthUnit.FEET);
+        QuantityLength cm = new QuantityLength(2.54, LengthUnit.CM);
+        QuantityLength inch = new QuantityLength(1.0, LengthUnit.INCH);
+
+        System.out.println("1 Yard equals 3 Feet: " + yard.equals(feet));
+        System.out.println("2.54 cm equals 1 Inch: " + cm.equals(inch));
     }
 }
