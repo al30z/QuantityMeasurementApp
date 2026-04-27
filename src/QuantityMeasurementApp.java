@@ -1,60 +1,60 @@
 // QuantityMeasurementApp.java
 public class QuantityMeasurementApp {
     public static void main(String[] args) {
-        QuantityLength oneFoot = new QuantityLength(1.0, LengthUnit.FEET);
-        QuantityLength twelveInches = new QuantityLength(12.0, LengthUnit.INCHES);
+        // Weight examples
+        QuantityWeight oneKg = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
+        QuantityWeight thousandGrams = new QuantityWeight(1000.0, WeightUnit.GRAM);
 
-        // UC4: Equality
-        System.out.println("1 Foot equals 12 Inches? " + oneFoot.equals(twelveInches));
+        // UC9: Equality
+        System.out.println("1 Kilogram equals 1000 Grams? " + oneKg.equals(thousandGrams));
 
-        // UC5: Conversion
-        QuantityLength hundredCm = new QuantityLength(100.0, LengthUnit.CENTIMETERS);
-        System.out.println("100 cm = " + hundredCm.convertTo(LengthUnit.FEET) + " Feet");
+        // UC9: Conversion
+        QuantityWeight fivePounds = new QuantityWeight(5.0, WeightUnit.POUND);
+        System.out.println("5 Pounds = " + fivePounds.convertTo(WeightUnit.KILOGRAM) + " Kilograms");
 
-        // UC6: Addition (default unit of first operand)
-        QuantityLength result1 = oneFoot.add(twelveInches);
-        System.out.println("1 Foot + 12 Inches = " + result1.getValue() + " " + result1.getUnit());
+        // UC9: Addition (default unit of first operand)
+        QuantityWeight sum1 = oneKg.add(fivePounds);
+        System.out.println("1 Kilogram + 5 Pounds = " + sum1.getValue() + " " + sum1.getUnit());
 
-        // UC7: Addition with target unit specification
-        QuantityLength result2 = oneFoot.addWithTargetUnit(twelveInches, LengthUnit.YARDS);
-        System.out.println("1 Foot + 12 Inches in Yards = " + result2.getValue() + " " + result2.getUnit());
+        // UC9: Addition with target unit specification
+        QuantityWeight sum2 = oneKg.addWithTargetUnit(fivePounds, WeightUnit.GRAM);
+        System.out.println("1 Kilogram + 5 Pounds in Grams = " + sum2.getValue() + " " + sum2.getUnit());
     }
 }
 
-// Standalone enum with conversion responsibility
-enum LengthUnit {
-    FEET(12.0),          // 1 foot = 12 inches
-    INCHES(1.0),         // base unit chosen: inches
-    YARDS(36.0),         // 1 yard = 36 inches
-    CENTIMETERS(0.393701); // 1 cm = 0.393701 inches
+// Standalone enum for weight units with conversion responsibility
+enum WeightUnit {
+    KILOGRAM(1.0),          // base unit: kilogram
+    GRAM(0.001),            // 1 gram = 0.001 kg
+    POUND(0.453592);        // 1 pound ≈ 0.453592 kg
 
-    private final double conversionFactorToInches;
+    private final double conversionFactorToKg;
 
-    LengthUnit(double conversionFactorToInches) {
-        this.conversionFactorToInches = conversionFactorToInches;
+    WeightUnit(double conversionFactorToKg) {
+        this.conversionFactorToKg = conversionFactorToKg;
     }
 
     public double getConversionFactor() {
-        return conversionFactorToInches;
+        return conversionFactorToKg;
     }
 
-    // Convert a value from this unit to inches (base unit)
+    // Convert a value from this unit to kilograms (base unit)
     public double toBase(double value) {
-        return value * conversionFactorToInches;
+        return value * conversionFactorToKg;
     }
 
-    // Convert a value from inches (base unit) to this unit
-    public double fromBase(double valueInInches) {
-        return valueInInches / conversionFactorToInches;
+    // Convert a value from kilograms (base unit) to this unit
+    public double fromBase(double valueInKg) {
+        return valueInKg / conversionFactorToKg;
     }
 }
 
-// QuantityLength class delegates conversion logic to LengthUnit
-class QuantityLength {
+// QuantityWeight class delegates conversion logic to WeightUnit
+class QuantityWeight {
     private final double value;
-    private final LengthUnit unit;
+    private final WeightUnit unit;
 
-    public QuantityLength(double value, LengthUnit unit) {
+    public QuantityWeight(double value, WeightUnit unit) {
         if (!Double.isFinite(value)) {
             throw new IllegalArgumentException("Value must be finite.");
         }
@@ -69,34 +69,34 @@ class QuantityLength {
         return value;
     }
 
-    public LengthUnit getUnit() {
+    public WeightUnit getUnit() {
         return unit;
     }
 
-    // UC4: Equality check
-    public boolean equals(QuantityLength other) {
+    // Equality check
+    public boolean equals(QuantityWeight other) {
         if (other == null) return false;
         double thisInBase = unit.toBase(this.value);
         double otherInBase = other.unit.toBase(other.value);
         return Math.abs(thisInBase - otherInBase) < 0.0001;
     }
 
-    // UC5: Conversion
-    public double convertTo(LengthUnit targetUnit) {
+    // Conversion
+    public double convertTo(WeightUnit targetUnit) {
         double valueInBase = unit.toBase(this.value);
         return targetUnit.fromBase(valueInBase);
     }
 
-    // UC6: Addition (result in first operand's unit)
-    public QuantityLength add(QuantityLength other) {
+    // Addition (result in first operand's unit)
+    public QuantityWeight add(QuantityWeight other) {
         double otherInThisUnit = other.convertTo(this.unit);
-        return new QuantityLength(this.value + otherInThisUnit, this.unit);
+        return new QuantityWeight(this.value + otherInThisUnit, this.unit);
     }
 
-    // UC7: Addition with target unit specification
-    public QuantityLength addWithTargetUnit(QuantityLength other, LengthUnit targetUnit) {
+    // Addition with target unit specification
+    public QuantityWeight addWithTargetUnit(QuantityWeight other, WeightUnit targetUnit) {
         double thisInTarget = this.convertTo(targetUnit);
         double otherInTarget = other.convertTo(targetUnit);
-        return new QuantityLength(thisInTarget + otherInTarget, targetUnit);
+        return new QuantityWeight(thisInTarget + otherInTarget, targetUnit);
     }
 }
