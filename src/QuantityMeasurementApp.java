@@ -4,14 +4,17 @@ public class QuantityMeasurementApp {
         QuantityLength oneFoot = new QuantityLength(1.0, LengthUnit.FEET);
         QuantityLength twelveInches = new QuantityLength(12.0, LengthUnit.INCHES);
 
-        QuantityLength result = oneFoot.add(twelveInches);
-        System.out.println("1 Foot + 12 Inches = " + result.getValue() + " " + result.getUnit());
+        // UC7: Addition with target unit specification
+        QuantityLength resultInYards = oneFoot.addWithTargetUnit(twelveInches, LengthUnit.YARDS);
+        System.out.println("1 Foot + 12 Inches in Yards = " 
+                           + resultInYards.getValue() + " " + resultInYards.getUnit());
 
-        QuantityLength threeFeet = new QuantityLength(3.0, LengthUnit.FEET);
         QuantityLength fiftyCm = new QuantityLength(50.0, LengthUnit.CENTIMETERS);
+        QuantityLength threeFeet = new QuantityLength(3.0, LengthUnit.FEET);
 
-        QuantityLength sum = threeFeet.add(fiftyCm);
-        System.out.println("3 Feet + 50 cm = " + sum.getValue() + " " + sum.getUnit());
+        QuantityLength resultInInches = threeFeet.addWithTargetUnit(fiftyCm, LengthUnit.INCHES);
+        System.out.println("3 Feet + 50 cm in Inches = " 
+                           + resultInInches.getValue() + " " + resultInInches.getUnit());
     }
 }
 
@@ -45,10 +48,24 @@ class QuantityLength {
         return valueInInches / targetUnit.getConversionFactor();
     }
 
-    // UC6: Addition
+    // UC6: Addition (default result in first operand's unit)
     public QuantityLength add(QuantityLength other) {
         double otherValueInThisUnit = convert(other.value, other.unit, this.unit);
         return new QuantityLength(this.value + otherValueInThisUnit, this.unit);
+    }
+
+    // UC7: Addition with target unit specification
+    public QuantityLength addWithTargetUnit(QuantityLength other, LengthUnit targetUnit) {
+        if (other == null || targetUnit == null) {
+            throw new IllegalArgumentException("Other quantity and target unit cannot be null.");
+        }
+
+        // Convert both operands into target unit
+        double thisInTarget = convert(this.value, this.unit, targetUnit);
+        double otherInTarget = convert(other.value, other.unit, targetUnit);
+
+        // Add and return result in target unit
+        return new QuantityLength(thisInTarget + otherInTarget, targetUnit);
     }
 }
 
